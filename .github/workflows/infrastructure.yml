@@ -11,6 +11,9 @@ jobs:
         runs-on: ubuntu-latest
         environment: ${{ matrix.environment }}
         steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              
             - name: Deploy Web App - ${{ matrix.environment }}
               id: webapp
               uses: ./.github/actions/webapp-action
