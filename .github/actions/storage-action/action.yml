@@ -1,0 +1,33 @@
+name: Blijven leren - Storage Action
+
+description: Creates an Azure Storage Account and Table Storage
+
+inputs:
+  principal_id:
+    description: 'Principal ID of the managed identity of the webapp'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to Azure
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Create/Update Storage Account
+      run: |
+        az storage account create --name ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }} --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} --location ${{ vars.AZURE_LOCATION }} --sku ${{ vars.AZURE_STORAGE_SKU }} --kind StorageV2
+
+    - name: Create/Update Table Storage
+      run: |
+        az storage table create --name LearningResources --account-name ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
+    
+    - name: Assign Storage Account Access to Web App
+      run: |
+        az role assignment create --assignee ${{ inputs.principal_id }} --role "Storage Blob Data Contributor" --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ vars.AZURE_RESOURCE_GROUP }}/providers/Microsoft.Storage/storageAccounts/${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}

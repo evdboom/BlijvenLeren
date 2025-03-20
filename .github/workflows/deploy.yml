@@ -1,0 +1,52 @@
+name: Deploy Workflow
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+        steps: 
+            - name: Checkout code
+              uses: actions/checkout@v4
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v4
+              with:
+                dotnet-version: 9.0.x
+            - name: Restore dependencies
+              run: |
+                Write-Host "Restoring dependencies for projects:"
+                Get-ChildItem -Recurse -Filter *.csproj | Where-Object { $_.Name -notmatch '\.Tests\.csproj$' } | ForEach-Object {           
+                Write-Host "$($_.Name)"
+                dotnet restore $_.FullName 
+                }
+            - name: Build
+              run: |
+                Write-Host "Building projects:"
+                Get-ChildItem -Recurse -Filter *.csproj | Where-Object { $_.Name -notmatch '\.Tests\.csproj$' } | ForEach-Object {           
+                Write-Host "$($_.Name)"
+                dotnet build $_.FullName --no-restore --configuration Release
+                }
+            - name: Test
+              run: |
+                Write-Host "Running tests:"
+                Get-ChildItem -Recurse -Filter *.csproj | Where-Object { $_.Name -match '\.Tests\.csproj$' } | ForEach-Object {           
+                Write-Host "$($_.Name)"
+                dotnet test $_.FullName --verbosity normal --configuration Release
+                }
+
+    deployment:
+        needs: build-and-test
+        strategy:
+            matrix:
+                environment: [dev, tst, acc, prd]
+        runs-on: ubuntu-latest
+        environment: ${{ matrix.environment }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              
+            - name: Deploy Web App - ${{ matrix.environment }}
+              uses: ./.github/actions/deploy-action

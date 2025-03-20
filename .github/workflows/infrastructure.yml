@@ -1,0 +1,24 @@
+name: Infrastructure Workflow
+
+on:
+    workflow_dispatch
+
+jobs:
+    deployment:
+        strategy:
+            matrix:
+                environment: [dev, tst, acc, prd]
+        runs-on: ubuntu-latest
+        environment: ${{ matrix.environment }}
+        steps:
+            - name: Deploy Web App - ${{ matrix.environment }}
+              id: webapp
+              uses: ./.github/actions/webapp-action
+
+            - name: Deploy Key Vault - ${{ matrix.environment }}
+              uses: ./.github/actions/keyvault-action
+              with:
+                principal_id: ${{ steps.webapp.outputs.principal_id }}
+
+            - name: Deploy Storage - ${{ matrix.environment }}
+              uses: ./.github/actions/storage-action
