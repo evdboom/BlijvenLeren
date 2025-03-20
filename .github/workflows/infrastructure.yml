@@ -4,24 +4,86 @@ on:
     workflow_dispatch
 
 jobs:
-    deployment:
-        strategy:
-            matrix:
-                environment: [dev, tst, acc, prd]
+    deploy-dev:
         runs-on: ubuntu-latest
-        environment: ${{ matrix.environment }}
+        environment: dev
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
-              
-            - name: Deploy Web App - ${{ matrix.environment }}
+
+            - name: Deploy Web App - dev
               id: webapp
               uses: ./.github/actions/webapp-action
 
-            - name: Deploy Key Vault - ${{ matrix.environment }}
+            - name: Deploy Key Vault - dev
               uses: ./.github/actions/keyvault-action
               with:
                 principal_id: ${{ steps.webapp.outputs.principal_id }}
 
-            - name: Deploy Storage - ${{ matrix.environment }}
+            - name: Deploy Storage - dev
               uses: ./.github/actions/storage-action
+              with:
+                principal_id: ${{ steps.webapp.outputs.principal_id }}
+    deploy-tst:
+      needs: deploy-dev
+      runs-on: ubuntu-latest
+      environment: tst
+      steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Deploy Web App - tst
+            id: webapp
+            uses: ./.github/actions/webapp-action
+
+          - name: Deploy Key Vault - tst
+            uses: ./.github/actions/keyvault-action
+            with:
+              principal_id: ${{ steps.webapp.outputs.principal_id }}
+
+          - name: Deploy Storage - tst
+            uses: ./.github/actions/storage-action    
+            with:
+              principal_id: ${{ steps.webapp.outputs.principal_id }}
+    deploy-acc:
+      needs: deploy-tst
+      runs-on: ubuntu-latest
+      environment: acc
+      steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Deploy Web App - acc
+            id: webapp
+            uses: ./.github/actions/webapp-action
+
+          - name: Deploy Key Vault - acc
+            uses: ./.github/actions/keyvault-action
+            with:
+              principal_id: ${{ steps.webapp.outputs.principal_id }}
+
+          - name: Deploy Storage - acc
+            uses: ./.github/actions/storage-action      
+            with:
+              principal_id: ${{ steps.webapp.outputs.principal_id }}   
+    deploy-prd:
+      needs: deploy-acc
+      runs-on: ubuntu-latest
+      environment: prd
+      steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Deploy Web App - prd
+            id: webapp
+            uses: ./.github/actions/webapp-action
+
+          - name: Deploy Key Vault - prd
+            uses: ./.github/actions/keyvault-action
+            with:
+              principal_id: ${{ steps.webapp.outputs.principal_id }}
+
+          - name: Deploy Storage - prd
+            uses: ./.github/actions/storage-action    
+            with:
+              principal_id: ${{ steps.webapp.outputs.principal_id }}                   
