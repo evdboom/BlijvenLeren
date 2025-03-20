@@ -17,10 +17,12 @@ runs:
       id: get-publish-profile
       run: |
         az webapp deployment list-publishing-profiles --name ${{ inputs.azure_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --query "[?publishMethod=='MSDeploy'].publishProfile" --output tsv > publishProfile.xml
+      shell: bash
 
     - name: Dotnet publish
       run: |
         dotnet publish -c Release -o /BlijvenLerenApi
+      shell: bash
 
     - name: Deploy Web App
       uses: azure/webapps-deploy@v2

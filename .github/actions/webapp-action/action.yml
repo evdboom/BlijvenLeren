@@ -33,24 +33,30 @@ runs:
     - name: Create/Update Resource Group
       run: |
         az group create --name ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }}
+      shell: bash
 
     - name: Create/Update App Service Plan
       run: |
         az appservice plan create --name ${{ inputs.azure_app_service_plan }} --resource-group ${{ inputs.azure_resource_group }} --sku {{ inputs.azure_app_service_sku }} --is-linux
+      shell: bash
 
     - name: Create/Update Web App
       run: |
         az webapp create --name ${{ inputs.azure_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --plan ${{ inputs.azure_app_service_plan }} --runtime "DOTNET|9.0"
+      shell: bash
 
     - name: Assign Managed Identity to Web App
       run: |
         az webapp identity assign --name ${{ inputs.azure_webapp_name }} --resource-group ${{ inputs.azure_resource_group }}
+      shell: bash
 
     - name: Get Managed Identity Principal ID
       id: get-identity
       run: |
         echo "::set-output name=principal_id::$(az webapp identity show --name ${{ inputs.azure_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --query principalId --output tsv)"
+      shell: bash
 
     - name: Set Storage Account Name as Environment Variable
       run: |
         az webapp config appsettings set --name ${{ inputs.azure_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --settings STORAGE_ACCOUNT_NAME=${{ inputs.azure_storage_account_name }}
+      shell: bash

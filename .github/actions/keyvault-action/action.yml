@@ -22,7 +22,9 @@ runs:
     - name: Create/Update Key Vault
       run: |
         az keyvault create --name ${{ inputs.azure_keyvault_name }} --resource-group ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }}
+      shell: bash
 
     - name: Set Key Vault Policy for Managed Identity
       run: |
         az keyvault set-policy --name ${{ inputs.azure_keyvault_name }} --object-id ${{ inputs.principal_id }} --secret-permissions get list
+      shell: bash
