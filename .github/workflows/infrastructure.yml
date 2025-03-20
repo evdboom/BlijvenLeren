@@ -32,6 +32,7 @@ jobs:
                 azure_app_service_plan: ${{ vars.AZURE_APP_SERVICE_PLAN }}
                 azure_app_service_sku: ${{ vars.AZURE_APP_SERVICE_SKU }}
                 azure_storage_account_name: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
+                azure_webapp_runtime: ${{ vars.AZURE_WEBAPP_RUNTIME }}
 
             - name: Deploy Key Vault
               uses: ./.github/actions/keyvault-action
