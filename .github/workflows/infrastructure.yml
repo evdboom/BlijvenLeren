@@ -1,7 +1,11 @@
 name: Infrastructure Workflow
 
 on:
-    workflow_dispatch
+  workflow_dispatch
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
     deploy-dev:
