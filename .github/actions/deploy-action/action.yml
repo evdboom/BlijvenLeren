@@ -1,19 +1,22 @@
 name: Deploy BlijvenLeren sites
+
 description: Deploy BlijvenLeren site
+
+inputs:
+  azure_webapp_name:
+    description: 'Name of the Azure Web App'
+    required: true
+  azure_resource_group:
+    description: 'Name of the Azure Resource Group'
+    required: true
+
 runs:
   using: 'composite'
   steps:
-    - name: Login to Azure
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
     - name: Get Publish Profile
       id: get-publish-profile
       run: |
-        az webapp deployment list-publishing-profiles --name ${{ vars.AZURE_WEBAPP_NAME }} --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} --query "[?publishMethod=='MSDeploy'].publishProfile" --output tsv > publishProfile.xml
+        az webapp deployment list-publishing-profiles --name ${{ inputs.azure_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --query "[?publishMethod=='MSDeploy'].publishProfile" --output tsv > publishProfile.xml
 
     - name: Dotnet publish
       run: |
@@ -22,7 +25,7 @@ runs:
     - name: Deploy Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+        app-name: ${{ inputs.azure_webapp_name }}
         publish-profile: publishProfile.xml
         package: /BlijvenLerenApi
             

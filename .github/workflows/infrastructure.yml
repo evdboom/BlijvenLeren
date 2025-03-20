@@ -11,19 +11,41 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Deploy Web App - dev
+            - name: Login to Azure
+              uses: azure/login@v2
+              with:
+                client-id: ${{ secrets.AZURE_CLIENT_ID }}
+                tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+                subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  
+
+            - name: Deploy Web App
               id: webapp
               uses: ./.github/actions/webapp-action
+              with:
+                azure_webapp_name: ${{ vars.AZURE_WEBAPP_NAME }}
+                azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+                azure_location: ${{ vars.AZURE_LOCATION }}
+                azure_app_service_plan: ${{ vars.AZURE_APP_SERVICE_PLAN }}
+                azure_app_service_sku: ${{ vars.AZURE_APP_SERVICE_SKU }}
+                azure_storage_account_name: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
 
-            - name: Deploy Key Vault - dev
+            - name: Deploy Key Vault
               uses: ./.github/actions/keyvault-action
               with:
                 principal_id: ${{ steps.webapp.outputs.principal_id }}
+                azure_keyvault_name: ${{ vars.AZURE_KEYVAULT_NAME }}
+                azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+                azure_location: ${{ vars.AZURE_LOCATION }}
 
-            - name: Deploy Storage - dev
+            - name: Deploy Storage
               uses: ./.github/actions/storage-action
               with:
                 principal_id: ${{ steps.webapp.outputs.principal_id }}
+                azure_storage_account_name: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
+                azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+                azure_location: ${{ vars.AZURE_LOCATION }}
+                azure_storage_sku: ${{ vars.AZURE_STORAGE_SKU }}
+                azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     deploy-tst:
       needs: deploy-dev
       runs-on: ubuntu-latest
@@ -32,19 +54,41 @@ jobs:
           - name: Checkout code
             uses: actions/checkout@v4
 
-          - name: Deploy Web App - tst
+          - name: Login to Azure
+            uses: azure/login@v2
+            with:
+              client-id: ${{ secrets.AZURE_CLIENT_ID }}
+              tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+              subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  
+
+          - name: Deploy Web App
             id: webapp
             uses: ./.github/actions/webapp-action
+            with:
+              azure_webapp_name: ${{ vars.AZURE_WEBAPP_NAME }}
+              azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+              azure_location: ${{ vars.AZURE_LOCATION }}
+              azure_app_service_plan: ${{ vars.AZURE_APP_SERVICE_PLAN }}
+              azure_app_service_sku: ${{ vars.AZURE_APP_SERVICE_SKU }}
+              azure_storage_account_name: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
 
-          - name: Deploy Key Vault - tst
+          - name: Deploy Key Vault
             uses: ./.github/actions/keyvault-action
             with:
               principal_id: ${{ steps.webapp.outputs.principal_id }}
+              azure_keyvault_name: ${{ vars.AZURE_KEYVAULT_NAME }}
+              azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+              azure_location: ${{ vars.AZURE_LOCATION }}
 
-          - name: Deploy Storage - tst
-            uses: ./.github/actions/storage-action    
+          - name: Deploy Storage
+            uses: ./.github/actions/storage-action
             with:
               principal_id: ${{ steps.webapp.outputs.principal_id }}
+              azure_storage_account_name: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
+              azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+              azure_location: ${{ vars.AZURE_LOCATION }}
+              azure_storage_sku: ${{ vars.AZURE_STORAGE_SKU }}
+              azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     deploy-acc:
       needs: deploy-tst
       runs-on: ubuntu-latest
@@ -53,19 +97,41 @@ jobs:
           - name: Checkout code
             uses: actions/checkout@v4
 
-          - name: Deploy Web App - acc
+          - name: Login to Azure
+            uses: azure/login@v2
+            with:
+              client-id: ${{ secrets.AZURE_CLIENT_ID }}
+              tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+              subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  
+
+          - name: Deploy Web App
             id: webapp
             uses: ./.github/actions/webapp-action
+            with:
+              azure_webapp_name: ${{ vars.AZURE_WEBAPP_NAME }}
+              azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+              azure_location: ${{ vars.AZURE_LOCATION }}
+              azure_app_service_plan: ${{ vars.AZURE_APP_SERVICE_PLAN }}
+              azure_app_service_sku: ${{ vars.AZURE_APP_SERVICE_SKU }}
+              azure_storage_account_name: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
 
-          - name: Deploy Key Vault - acc
+          - name: Deploy Key Vault
             uses: ./.github/actions/keyvault-action
             with:
               principal_id: ${{ steps.webapp.outputs.principal_id }}
+              azure_keyvault_name: ${{ vars.AZURE_KEYVAULT_NAME }}
+              azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+              azure_location: ${{ vars.AZURE_LOCATION }}
 
-          - name: Deploy Storage - acc
-            uses: ./.github/actions/storage-action      
+          - name: Deploy Storage
+            uses: ./.github/actions/storage-action
             with:
-              principal_id: ${{ steps.webapp.outputs.principal_id }}   
+              principal_id: ${{ steps.webapp.outputs.principal_id }}
+              azure_storage_account_name: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
+              azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+              azure_location: ${{ vars.AZURE_LOCATION }}
+              azure_storage_sku: ${{ vars.AZURE_STORAGE_SKU }}
+              azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     deploy-prd:
       needs: deploy-acc
       runs-on: ubuntu-latest
@@ -74,16 +140,38 @@ jobs:
           - name: Checkout code
             uses: actions/checkout@v4
 
-          - name: Deploy Web App - prd
+          - name: Login to Azure
+            uses: azure/login@v2
+            with:
+              client-id: ${{ secrets.AZURE_CLIENT_ID }}
+              tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+              subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  
+
+          - name: Deploy Web App
             id: webapp
             uses: ./.github/actions/webapp-action
+            with:
+              azure_webapp_name: ${{ vars.AZURE_WEBAPP_NAME }}
+              azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+              azure_location: ${{ vars.AZURE_LOCATION }}
+              azure_app_service_plan: ${{ vars.AZURE_APP_SERVICE_PLAN }}
+              azure_app_service_sku: ${{ vars.AZURE_APP_SERVICE_SKU }}
+              azure_storage_account_name: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
 
-          - name: Deploy Key Vault - prd
+          - name: Deploy Key Vault
             uses: ./.github/actions/keyvault-action
             with:
               principal_id: ${{ steps.webapp.outputs.principal_id }}
+              azure_keyvault_name: ${{ vars.AZURE_KEYVAULT_NAME }}
+              azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+              azure_location: ${{ vars.AZURE_LOCATION }}
 
-          - name: Deploy Storage - prd
-            uses: ./.github/actions/storage-action    
+          - name: Deploy Storage
+            uses: ./.github/actions/storage-action
             with:
-              principal_id: ${{ steps.webapp.outputs.principal_id }}                   
+              principal_id: ${{ steps.webapp.outputs.principal_id }}
+              azure_storage_account_name: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
+              azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+              azure_location: ${{ vars.AZURE_LOCATION }}
+              azure_storage_sku: ${{ vars.AZURE_STORAGE_SKU }}
+              azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}               
