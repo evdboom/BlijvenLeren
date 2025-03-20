@@ -1,42 +1,31 @@
 name: Deploy BlijvenLeren sites
-description: Deploy BlijvenLeren sites to the given environment
-inputs:
-  environment:
-    description: 'The environment to deploy to'
-    required: true
-    default: 'dev'
-    type: string
+description: Deploy BlijvenLeren site
 runs:
   using: 'composite'
   steps:
     - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/checkout@v2
+
+    - name: Login to Azure
+      uses: azure/login@v2
       with:
-        dotnet-version: 9.0.x
-    - name: Restore dependencies
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Get Publish Profile
+      id: get-publish-profile
       run: |
-        Write-Host "Restoring dependencies for projects:"
-        Get-ChildItem -Recurse -Filter *.csproj | Where-Object { $_.Name -notmatch '\.Tests\.csproj$' } | ForEach-Object {           
-          Write-Host "$($_.Name)"
-          dotnet restore $_.FullName 
-        }
-    - name: Build
+        az webapp deployment list-publishing-profiles --name ${{ vars.AZURE_WEBAPP_NAME }} --resource-group ${{ vars.AZURE_RESOURCE_GROUP }} --query "[?publishMethod=='MSDeploy'].publishProfile" --output tsv > publishProfile.xml
+
+    - name: Dotnet publish
       run: |
-        Write-Host "Building projects:"
-        Get-ChildItem -Recurse -Filter *.csproj | Where-Object { $_.Name -notmatch '\.Tests\.csproj$' } | ForEach-Object {           
-          Write-Host "$($_.Name)"
-          dotnet build $_.FullName --no-restore --configuration Release
-        }
-    - name: Test
-      run: |
-        Write-Host "Running tests:"
-        Get-ChildItem -Recurse -Filter *.csproj | Where-Object { $_.Name -match '\.Tests\.csproj$' } | ForEach-Object {           
-          Write-Host "$($_.Name)"
-          dotnet test $_.FullName --verbosity normal --configuration Release
-        }
-    - name: publish
-      run: |
-        Write-Host "Publishing sites:"
+        dotnet publish -c Release -o /BlijvenLerenApi
+
+    - name: Deploy Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+        publish-profile: publishProfile.xml
+        package: /BlijvenLerenApi
             
