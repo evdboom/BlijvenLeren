@@ -164,13 +164,13 @@ jobs:
               azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
               azure_location: ${{ vars.AZURE_LOCATION }}
 
-          - name: Set API Token
-            uses: ./.github/actions/update-environment-secret-action
-            with:
-              secret_name: STATIC_API_TOKEN
-              secret_value: ${{ steps.frontend.outputs.api_key }}
-              pat_token: ${{ secrets.PAT_TOKEN }}
-              environment_name: dev
+          # - name: Set API Token
+          #   uses: ./.github/actions/update-environment-secret-action
+          #   with:
+          #     secret_name: STATIC_API_TOKEN
+          #     secret_value: ${{ steps.frontend.outputs.api_key }}
+          #     pat_token: ${{ secrets.PAT_TOKEN }}
+          #     environment_name: dev
 
           - name: Deploy Key Vault
             uses: ./.github/actions/keyvault-action
