@@ -1,6 +1,6 @@
 name: Deploy BlijvenLeren sites
 
-description: Deploy BlijvenLeren site
+description: Deploy BlijvenLeren sites
 
 inputs:
   azure_webapp_name:
@@ -8,6 +8,12 @@ inputs:
     required: true
   azure_resource_group:
     description: 'Name of the Azure Resource Group'
+    required: true
+  github_token:
+    description: 'GitHub token'
+    required: true
+  azure_static_web_apps_api_token:
+    description: 'Azure Static Web Apps API token'
     required: true
 
 runs:
@@ -30,4 +36,14 @@ runs:
         app-name: ${{ inputs.azure_webapp_name }}
         publish-profile: publishProfile.xml
         package: /BlijvenLerenApi
+  
+    - name: Deploy Static App
+      uses: Azure/static-web-apps-deploy@v1
+      with:
+        azure_static_web_apps_api_token: ${{ inputs.azure_static_web_apps_api_token }}
+        repo_token: ${{ inputs.github_token }}
+        action: "upload"
+        app_location: "/BlijvenLerenWeb"
+        api_location: "" 
+        output_location: "wwwroot"
             

@@ -1,0 +1,61 @@
+name: Deploy Azure Static Web App
+
+description: Deploys an Azure Static Web App
+
+inputs:
+  azure_static_webapp_name:
+    description: 'Name of the Azure Static Web App'
+    required: true
+  azure_resource_group:
+    description: 'Name of the Azure Resource Group'
+    required: true
+  azure_location:
+    description: 'Location of the Azure Resource Group'
+    required: true
+  azure_subscription_id:
+    description: 'Subscription ID of the Azure Subscription'
+    required: true
+  app_location:
+    description: 'Location of the application code'
+    required: true
+  api_location:
+    description: 'Location of the API code'
+    default: ''
+    required: false
+  output_location:
+    description: 'Location of the build output'
+    required: true
+  pat_token:
+    description: 'GitHub personal access token'
+    required: true
+  environment_name:
+    description: 'Environment'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create/Update Resource Group
+      run: |
+        az group create --name ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }}
+      shell: bash
+
+    - name: Create/Update Static Web App
+      run: |
+        az staticwebapp create --name ${{ inputs.azure_static_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }} --source ${{ inputs.app_location }} --api-location ${{ inputs.api_location }} --output-location ${{ inputs.output_location }} --subscription ${{ inputs.azure_subscription_id }}
+      shell: bash
+
+    - name: Get API Token
+      run: |
+        api_token=$(az staticwebapp secrets list --name ${{ inputs.azure_static_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --query "properties.apiKey" --output tsv)
+        echo "static_api_token=${api_token}" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Set API Token
+      uses: update-environment-secret-action
+      with:
+        secret_name: STATIC_API_TOKEN
+        secret_value: ${{ env.static_api_token }}
+        pat_token: ${{ inputs.pat_token }}
+        environment_name: ${{ inputs.environment_name }}
+
