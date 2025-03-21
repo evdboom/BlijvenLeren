@@ -44,7 +44,7 @@ jobs:
                 azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 app_location: ${{ vars.STATIC_APP_LOCATION }}
                 output_location: ${{ vars.STATIC_OUTPUT_LOCATION }}
-                github_token: ${{ secrets.GITHUB_TOKEN }}
+                github_token: ${{ secrets.AZURE_TOKEN }}
 
             - name: Set API Token
               uses: ./.github/actions/update-environment-secret-action
@@ -109,7 +109,7 @@ jobs:
               azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
               app_location: ${{ vars.STATIC_APP_LOCATION }}
               output_location: ${{ vars.STATIC_OUTPUT_LOCATION }}
-              github_token: ${{ secrets.GITHUB_TOKEN }}
+              github_token: ${{ secrets.AZURE_TOKEN }}
 
           - name: Set API Token
             uses: ./.github/actions/update-environment-secret-action
@@ -174,7 +174,7 @@ jobs:
               azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
               app_location: ${{ vars.STATIC_APP_LOCATION }}
               output_location: ${{ vars.STATIC_OUTPUT_LOCATION }}
-              github_token: ${{ secrets.GITHUB_TOKEN }}
+              github_token: ${{ secrets.AZURE_TOKEN}}
 
           - name: Set API Token
             uses: ./.github/actions/update-environment-secret-action
@@ -239,7 +239,7 @@ jobs:
               azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
               app_location: ${{ vars.STATIC_APP_LOCATION }}
               output_location: ${{ vars.STATIC_OUTPUT_LOCATION }}
-              github_token: ${{ secrets.GITHUB_TOKEN }}
+              github_token: ${{ secrets.AZURE_TOKEN }}
 
           - name: Set API Token
             uses: ./.github/actions/update-environment-secret-action
