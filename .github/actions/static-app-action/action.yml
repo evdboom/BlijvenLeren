@@ -25,12 +25,11 @@ inputs:
   output_location:
     description: 'Location of the build output'
     required: true
-  pat_token:
-    description: 'GitHub personal access token'
-    required: true
-  environment_name:
-    description: 'Environment'
-    required: true
+
+outputs:
+  api_key:
+    description: 'Api key of the static site'
+    value: ${{ steps.get-api-token.outputs.static_api_token }}
 
 runs:
   using: "composite"
@@ -46,16 +45,9 @@ runs:
       shell: bash
 
     - name: Get API Token
+      id: get-api-token
       run: |
         api_token=$(az staticwebapp secrets list --name ${{ inputs.azure_static_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --query "properties.apiKey" --output tsv)
-        echo "static_api_token=${api_token}" >> $GITHUB_ENV
+        echo "static_api_token=${api_token}" >> $GITHUB_OUTPUT
       shell: bash
-
-    - name: Set API Token
-      uses: update-environment-secret-action
-      with:
-        secret_name: STATIC_API_TOKEN
-        secret_value: ${{ env.static_api_token }}
-        pat_token: ${{ inputs.pat_token }}
-        environment_name: ${{ inputs.environment_name }}
 
