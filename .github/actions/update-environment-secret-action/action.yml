@@ -3,8 +3,8 @@ name: Update Environment secret
 description: Updates a secret in the GitHub repository environment
 
 inputs:
-  github_token:
-    description: 'GitHub token'
+  pat_token:
+    description: 'GitHub personal access token'
     required: true
   secret_name:
     description: 'Name of the secret to update'
@@ -35,7 +35,7 @@ runs:
         GITHUB_ENVIRONMENT: ${{ inputs.environment_name }}
       with:
         result-encoding: string
-        github-token: ${{ inputs.github_token }}
+        github-token: ${{ inputs.pat_token }}
         script: |
           const sodium = require('sodium-native');
           const { data: {key: publicKey, key_id: keyId} } = await github.rest.actions.getRepoPublicKey({...context.repo});
