@@ -28,11 +28,12 @@ runs:
       shell: bash
       
     - name: Update Secret
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       env:
         SECRET_VALUE: ${{ inputs.secret_value }}
         SECRET_NAME: ${{ inputs.secret_name }}
         GITHUB_ENVIRONMENT: ${{ inputs.environment_name }}
+        GITHUB_TOKEN = ${{ inputs.pat_token }}
       with:
         result-encoding: string
         github-token: ${{ inputs.pat_token }}
@@ -46,6 +47,8 @@ runs:
 
             sodium.crypto_box_seal(ciphertext, message, key);
             const encryptedToken = ciphertext.toString('base64');
+
+              
 
             await github.rest.actions.createOrUpdateEnvironmentSecret({
               owner: 'evdboom',
