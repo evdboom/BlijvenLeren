@@ -8,27 +8,89 @@ on:
       - '.github/**'
 
 jobs:
-    build-and-test:
-        runs-on: ubuntu-latest
-        steps: 
-            - name: Checkout code
-              uses: actions/checkout@v4
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Build and test
-              uses: ./.github/actions/build-and-test-action
-              with:
-                dotnet_version: ${{ vars.DOTNET_VERSION }}
+      - name: Build and test
+        uses: ./.github/actions/build-and-test-action
+        with:
+          dotnet_version: ${{ vars.DOTNET_VERSION }}
 
-    deployment:
-        needs: build-and-test
-        strategy:
-            matrix:
-                environment: [dev, tst, acc, prd]
-        runs-on: ubuntu-latest
-        environment: ${{ matrix.environment }}
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-              
-            - name: Deploy Web App - ${{ matrix.environment }}
-              uses: ./.github/actions/deploy-action
+  deployment-dev:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Deploy Web Apps
+        uses: ./.github/actions/deploy-action
+        with:
+          azure_webapp_name: ${{ vars.AZURE_WEBAPP_NAME }}
+          azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          azure_static_web_apps_api_token: ${{ secrets.STATIC_API_TOKEN }}
+    
+  run-api-tests:
+    needs: deployment-dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Run API tests
+        run: |
+          echo "Running API tests"
+        shell: bash
+
+  deployment-tst:
+    needs: run-api-tests
+    runs-on: ubuntu-latest
+    environment: tst
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+          
+        - name: Deploy Web Apps
+          uses: ./.github/actions/deploy-action
+          with:
+            azure_webapp_name: ${{ vars.AZURE_WEBAPP_NAME }}
+            azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            azure_static_web_apps_api_token: ${{ secrets.STATIC_API_TOKEN }}
+
+  deployment-acc:
+    needs: run-api-tests
+    runs-on: ubuntu-latest
+    environment: acc
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+          
+        - name: Deploy Web Apps
+          uses: ./.github/actions/deploy-action
+          with:
+            azure_webapp_name: ${{ vars.AZURE_WEBAPP_NAME }}
+            azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            azure_static_web_apps_api_token: ${{ secrets.STATIC_API_TOKEN }}
+
+  deployment-prd:
+    needs: run-api-tests
+    runs-on: ubuntu-latest
+    environment: prd
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+          
+        - name: Deploy Web Apps
+          uses: ./.github/actions/deploy-action
+          with:
+            azure_webapp_name: ${{ vars.AZURE_WEBAPP_NAME }}
+            azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            azure_static_web_apps_api_token: ${{ secrets.STATIC_API_TOKEN }}

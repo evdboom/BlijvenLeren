@@ -3,8 +3,8 @@ name: Update Environment secret
 description: Updates a secret in the GitHub repository environment
 
 inputs:
-  github_token:
-    description: 'GitHub token'
+  pat_token:
+    description: 'GitHub personal access token'
     required: true
   secret_name:
     description: 'Name of the secret to update'
@@ -28,14 +28,15 @@ runs:
       shell: bash
       
     - name: Update Secret
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
       env:
         SECRET_VALUE: ${{ inputs.secret_value }}
         SECRET_NAME: ${{ inputs.secret_name }}
         GITHUB_ENVIRONMENT: ${{ inputs.environment_name }}
+        GITHUB_TOKEN: ${{ inputs.pat_token }}
       with:
         result-encoding: string
-        github-token: ${{ inputs.github_token }}
+        github-token: ${{ inputs.pat_token }}
         script: |
           const sodium = require('sodium-native');
           const { data: {key: publicKey, key_id: keyId} } = await github.rest.actions.getRepoPublicKey({...context.repo});
@@ -47,13 +48,22 @@ runs:
             sodium.crypto_box_seal(ciphertext, message, key);
             const encryptedToken = ciphertext.toString('base64');
 
-            await github.rest.actions.createOrUpdateEnvironmentSecret({
-              ...context.repo, 
-              environment_name: process.env.GITHUB_ENVIRONMENT,
-              secret_name: process.env.SECRET_NAME,
-              encrypted_value: encryptedToken,
-              key_id: keyId,
+            const response = await fetch(`https://api.github.com/repos/evdboom/BlijvenLeren/environments/${process.env.GITHUB_ENVIRONMENT}/secrets/${process.env.SECRET_NAME}`, {
+              method: 'PUT',
+              headers: {
+                'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/vnd.github.v3+json'
+              },
+              body: JSON.stringify({
+                encrypted_value: encryptedToken,
+                key_id: keyId
+              })
             });
+
+            if (!response.ok) {
+              throw new Error(`Failed to update secret: ${response.statusText}`);
+            }
           } else {
             core.error('Failed to fetch the public key. Unable to update secret');
           }
