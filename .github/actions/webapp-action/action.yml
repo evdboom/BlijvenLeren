@@ -56,7 +56,7 @@ runs:
     - name: Get Managed Identity Principal ID
       id: get-identity
       run: |
-        echo "::set-output name=principal_id::$(az webapp identity show --name ${{ inputs.azure_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --query principalId --output tsv)"
+        echo "principal_id=$(az webapp identity show --name ${{ inputs.azure_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --query principalId --output tsv)" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Set Storage Account Name as Environment Variable
