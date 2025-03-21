@@ -28,14 +28,14 @@ runs:
     - name: Create/Update Storage Account
       run: |
         az storage account create --name ${{ inputs.azure_storage_account_name }} --resource-group ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }} --sku ${{ inputs.azure_storage_sku }} --kind StorageV2
-      shell: bash
+v
 
     - name: Create/Update Table Storage
       run: |
-        az storage table create --name LearningResources --account-name ${{ inputs.azure_storage_account_name }}
+        az storage table create --name LearningResources --account-name ${{ inputs.azure_storage_account_name }} --auth-mode login
       shell: bash
     
     - name: Assign Storage Account Access to Web App
       run: |
-        az role assignment create --assignee ${{ inputs.principal_id }} --role "Storage Blob Data Contributor" --scope /subscriptions/${{ inputs.azure_subscription_id }}/resourceGroups/${{ inputs.azure_resource_group }}/providers/Microsoft.Storage/storageAccounts/${{ inputs.azure_storage_account_name }}
+        az role assignment create --assignee-object-id ${{ inputs.principal_id }} --assignee-principal-type ServicePrincipal  --role "Storage Blob Data Contributor" --scope /subscriptions/${{ inputs.azure_subscription_id }}/resourceGroups/${{ inputs.azure_resource_group }}/providers/Microsoft.Storage/storageAccounts/${{ inputs.azure_storage_account_name }}
       shell: bash
