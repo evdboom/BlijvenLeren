@@ -14,6 +14,9 @@ inputs:
     required: true
   azure_location:
     description: 'Location of the Azure Resource Group'
+    required: true
+  azure_subscription_id:
+    description: 'Subscription ID of the Azure Subscription'
     required: true    
 
 runs:
@@ -35,7 +38,7 @@ runs:
         az keyvault create --name ${{ inputs.azure_keyvault_name }} --resource-group ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }}
       shell: bash
 
-    - name: Set Key Vault Policy for Managed Identity
+    - name: Assign Key Vault Secrets User Role to Managed Identity
       run: |
-        az keyvault set-policy --name ${{ inputs.azure_keyvault_name }} --object-id ${{ inputs.principal_id }} --secret-permissions get list
+        az role assignment create --role "Key Vault Secrets User" --assignee ${{ inputs.principal_id }} --scope /subscriptions/${{ inputs.azure_subscription_id }}/resourceGroups/${{ inputs.azure_resource_group }}/providers/Microsoft.KeyVault/vaults/${{ inputs.azure_keyvault_name }}
       shell: bash
