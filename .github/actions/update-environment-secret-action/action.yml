@@ -48,7 +48,8 @@ runs:
             const encryptedToken = ciphertext.toString('base64');
 
             await github.rest.actions.createOrUpdateEnvironmentSecret({
-              ...context.repo, 
+              owner: evdboom,
+              repo: BlijvenLeren, 
               environment_name: process.env.GITHUB_ENVIRONMENT,
               secret_name: process.env.SECRET_NAME,
               encrypted_value: encryptedToken,

@@ -12,18 +12,6 @@ inputs:
   azure_location:
     description: 'Location of the Azure Resource Group'
     required: true
-  azure_subscription_id:
-    description: 'Subscription ID of the Azure Subscription'
-    required: true
-  app_location:
-    description: 'Location of the application code'
-    required: true
-  output_location:
-    description: 'Location of the build output'
-    required: true
-  github_token:
-    description: 'GitHub token'
-    required: true
 
 outputs:
   api_key:
