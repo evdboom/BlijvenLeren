@@ -35,10 +35,10 @@ runs:
     - name: Create/Update Key Vault
       if: env.keyvault_exists == 'false'
       run: |
-        az keyvault create --name ${{ inputs.azure_keyvault_name }} --resource-group ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }}
+        az keyvault create --name ${{ inputs.azure_keyvault_name }} --resource-group ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }} --enable-rbac-authorization true
       shell: bash
 
     - name: Assign Key Vault Secrets User Role to Managed Identity
       run: |
-        az role assignment create --role "Key Vault Secrets User" --assignee ${{ inputs.principal_id }} --scope /subscriptions/${{ inputs.azure_subscription_id }}/resourceGroups/${{ inputs.azure_resource_group }}/providers/Microsoft.KeyVault/vaults/${{ inputs.azure_keyvault_name }}
+        az role assignment create --role "Key Vault Secrets User" --assignee-object-id ${{ inputs.principal_id }} --assignee-principal-type ServicePrincipal --scope /subscriptions/${{ inputs.azure_subscription_id }}/resourceGroups/${{ inputs.azure_resource_group }}/providers/Microsoft.KeyVault/vaults/${{ inputs.azure_keyvault_name }}
       shell: bash
