@@ -18,10 +18,6 @@ inputs:
   app_location:
     description: 'Location of the application code'
     required: true
-  api_location:
-    description: 'Location of the API code'
-    default: ''
-    required: false
   output_location:
     description: 'Location of the build output'
     required: true
@@ -41,7 +37,7 @@ runs:
 
     - name: Create/Update Static Web App
       run: |
-        az staticwebapp create --name ${{ inputs.azure_static_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }} --source ${{ inputs.app_location }} --api-location ${{ inputs.api_location }} --output-location ${{ inputs.output_location }} --subscription ${{ inputs.azure_subscription_id }}
+        az staticwebapp create --name ${{ inputs.azure_static_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }} --source ${{ inputs.app_location }} --api-location '' --output-location ${{ inputs.output_location }} --subscription ${{ inputs.azure_subscription_id }}
       shell: bash
 
     - name: Get API Token
