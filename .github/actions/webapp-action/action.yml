@@ -25,7 +25,6 @@ inputs:
     description: 'Runtime of the Azure Web App'
     required: true
 
-
 outputs:
   principal_id:
     description: 'Principal ID of the managed identity'

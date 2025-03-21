@@ -35,6 +35,7 @@ jobs:
                 azure_webapp_runtime: ${{ vars.AZURE_WEBAPP_RUNTIME }}
 
             - name: Deploy FrontEnd
+              id: frontend
               uses: ./.github/actions/static-app-action
               with:
                 azure_static_webapp_name: ${{ vars.AZURE_STATIC_WEBAPP_NAME }}
@@ -43,6 +44,12 @@ jobs:
                 azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 app_location: ${{ vars.STATIC_APP_LOCATION }}
                 output_location: ${{ vars.STATIC_OUTPUT_LOCATION }}
+
+            - name: Set API Token
+              uses: ./.github/actions/update-environment-secret-action
+              with:
+                secret_name: STATIC_API_TOKEN
+                secret_value: ${{ steps.frontend.outputs.api_key }}
                 pat_token: ${{ secrets.PAT_TOKEN }}
                 environment_name: dev
 
@@ -92,6 +99,7 @@ jobs:
               azure_webapp_runtime: ${{ vars.AZURE_WEBAPP_RUNTIME }}
 
           - name: Deploy FrontEnd
+            id: frontend
             uses: ./.github/actions/static-app-action
             with:
               azure_static_webapp_name: ${{ vars.AZURE_STATIC_WEBAPP_NAME }}
@@ -100,6 +108,12 @@ jobs:
               azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
               app_location: ${{ vars.STATIC_APP_LOCATION }}
               output_location: ${{ vars.STATIC_OUTPUT_LOCATION }}
+
+          - name: Set API Token
+            uses: ./.github/actions/update-environment-secret-action
+            with:
+              secret_name: STATIC_API_TOKEN
+              secret_value: ${{ steps.frontend.outputs.api_key }}
               pat_token: ${{ secrets.PAT_TOKEN }}
               environment_name: tst
 
@@ -149,6 +163,7 @@ jobs:
               azure_webapp_runtime: ${{ vars.AZURE_WEBAPP_RUNTIME }}
 
           - name: Deploy FrontEnd
+            id: frontend
             uses: ./.github/actions/static-app-action
             with:
               azure_static_webapp_name: ${{ vars.AZURE_STATIC_WEBAPP_NAME }}
@@ -157,8 +172,14 @@ jobs:
               azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
               app_location: ${{ vars.STATIC_APP_LOCATION }}
               output_location: ${{ vars.STATIC_OUTPUT_LOCATION }}
+
+          - name: Set API Token
+            uses: ./.github/actions/update-environment-secret-action
+            with:
+              secret_name: STATIC_API_TOKEN
+              secret_value: ${{ steps.frontend.outputs.api_key }}
               pat_token: ${{ secrets.PAT_TOKEN }}
-              environment_name: acc
+              environment_name: dev
 
           - name: Deploy Key Vault
             uses: ./.github/actions/keyvault-action
@@ -206,6 +227,7 @@ jobs:
               azure_webapp_runtime: ${{ vars.AZURE_WEBAPP_RUNTIME }}
 
           - name: Deploy FrontEnd
+            id: frontend 
             uses: ./.github/actions/static-app-action
             with:
               azure_static_webapp_name: ${{ vars.AZURE_STATIC_WEBAPP_NAME }}
@@ -214,8 +236,14 @@ jobs:
               azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
               app_location: ${{ vars.STATIC_APP_LOCATION }}
               output_location: ${{ vars.STATIC_OUTPUT_LOCATION }}
+
+          - name: Set API Token
+            uses: ./.github/actions/update-environment-secret-action
+            with:
+              secret_name: STATIC_API_TOKEN
+              secret_value: ${{ steps.frontend.outputs.api_key }}
               pat_token: ${{ secrets.PAT_TOKEN }}
-              environment_name: prd
+              environment_name: dev
 
           - name: Deploy Key Vault
             uses: ./.github/actions/keyvault-action
