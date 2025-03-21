@@ -84,6 +84,7 @@ jobs:
               azure_keyvault_name: ${{ vars.AZURE_KEYVAULT_NAME }}
               azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
               azure_location: ${{ vars.AZURE_LOCATION }}
+              azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
           - name: Deploy Storage
             uses: ./.github/actions/storage-action
@@ -127,6 +128,7 @@ jobs:
               azure_keyvault_name: ${{ vars.AZURE_KEYVAULT_NAME }}
               azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
               azure_location: ${{ vars.AZURE_LOCATION }}
+              azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
           - name: Deploy Storage
             uses: ./.github/actions/storage-action
@@ -170,6 +172,7 @@ jobs:
               azure_keyvault_name: ${{ vars.AZURE_KEYVAULT_NAME }}
               azure_resource_group: ${{ vars.AZURE_RESOURCE_GROUP }}
               azure_location: ${{ vars.AZURE_LOCATION }}
+              azure_subscription_id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
           - name: Deploy Storage
             uses: ./.github/actions/storage-action

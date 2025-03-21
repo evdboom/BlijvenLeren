@@ -1,0 +1,38 @@
+name: Build BlijvenLeren sites
+
+description: DeBuildploy BlijvenLeren sites
+
+inputs:
+  dotnet_version:
+    description: 'Version of .NET to use'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ inputs.dotnet_version }}
+        
+    - name: Restore dependencies
+      run: |
+        Write-Host "Restoring dependencies for projects:"
+        Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object {           
+          Write-Host "$($_.Name)"
+          dotnet restore $_.FullName 
+        }
+    - name: Build
+      run: |
+        Write-Host "Building projects:"
+        Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object {           
+          Write-Host "$($_.Name)"
+          dotnet build $_.FullName --no-restore --configuration Release
+        }
+    - name: Test
+      run: |
+        Write-Host "Running unittests:"
+        Get-ChildItem -Recurse -Filter *.csproj | Where-Object { $_.Name -match '\.Tests\.csproj$' } | ForEach-Object {           
+          Write-Host "$($_.Name)"
+          dotnet test $_.FullName --verbosity normal --no-build --configuration Release
+        }
