@@ -26,7 +26,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  
       - name: Deploy Web Apps
         uses: ./.github/actions/deploy-action
         with:
@@ -54,7 +60,13 @@ jobs:
     steps:
         - name: Checkout code
           uses: actions/checkout@v4
-          
+
+        - name: Login to Azure
+          uses: azure/login@v2
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  
         - name: Deploy Web Apps
           uses: ./.github/actions/deploy-action
           with:
@@ -70,6 +82,13 @@ jobs:
     steps:
         - name: Checkout code
           uses: actions/checkout@v4
+
+        - name: Login to Azure
+          uses: azure/login@v2
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  
           
         - name: Deploy Web Apps
           uses: ./.github/actions/deploy-action
@@ -86,7 +105,14 @@ jobs:
     steps:
         - name: Checkout code
           uses: actions/checkout@v4
-          
+
+        - name: Login to Azure
+          uses: azure/login@v2
+          with:
+            client-id: ${{ secrets.AZURE_CLIENT_ID }}
+            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  
+            
         - name: Deploy Web Apps
           uses: ./.github/actions/deploy-action
           with:
