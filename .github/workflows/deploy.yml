@@ -1,9 +1,11 @@
 name: Deploy Workflow
 
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/**'
 
 jobs:
     build-and-test:
