@@ -28,8 +28,8 @@ runs:
     - name: Create/Update Storage Account
       run: |
         az storage account create --name ${{ inputs.azure_storage_account_name }} --resource-group ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }} --sku ${{ inputs.azure_storage_sku }} --kind StorageV2
-v
-
+      shell: bash
+      
     - name: Create/Update Table Storage
       run: |
         az storage table create --name LearningResources --account-name ${{ inputs.azure_storage_account_name }} --auth-mode login
