@@ -29,6 +29,7 @@ inputs:
 outputs:
   principal_id:
     description: 'Principal ID of the managed identity'
+    value: ${{ steps.get-identity.outputs.principal_id }}
 
 runs:
   using: "composite"
