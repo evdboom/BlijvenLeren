@@ -16,29 +16,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+    - name: Build and test
+      uses: ./.github/actions/build-and-test-action
       with:
-        dotnet-version: 9.0.x
-        
-    - name: Restore dependencies
-      run: |
-        Write-Host "Restoring dependencies for projects:"
-        Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object {           
-          Write-Host "$($_.Name)"
-          dotnet restore $_.FullName 
-        }
-    - name: Build
-      run: |
-        Write-Host "Building projects:"
-        Get-ChildItem -Recurse -Filter *.csproj | ForEach-Object {           
-          Write-Host "$($_.Name)"
-          dotnet build $_.FullName --no-restore --configuration Release
-        }
-    - name: Test
-      run: |
-        Write-Host "Running unittests:"
-        Get-ChildItem -Recurse -Filter *.csproj | Where-Object { $_.Name -match '\.Tests\.csproj$' } | ForEach-Object {           
-          Write-Host "$($_.Name)"
-          dotnet test $_.FullName --verbosity normal --no-build --configuration Release
-        }
+        dotnet_version: ${{ vars.DOTNET_VERSION }}
