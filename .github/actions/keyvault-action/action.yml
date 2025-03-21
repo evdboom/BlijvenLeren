@@ -19,7 +19,18 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Check if Key Vault exists
+      id: check-keyvault
+      run: |
+        if [ "$(az keyvault list --resource-group ${{ inputs.azure_resource_group }} --query "[?name=='${{ inputs.azure_keyvault_name }}'].name" --output tsv)" ]; then
+          echo "keyvault_exists=true" >> $GITHUB_ENV
+        else
+          echo "keyvault_exists=false" >> $GITHUB_ENV
+        fi
+      shell: bash
+
     - name: Create/Update Key Vault
+      if: env.keyvault_exists == 'false'
       run: |
         az keyvault create --name ${{ inputs.azure_keyvault_name }} --resource-group ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }}
       shell: bash
