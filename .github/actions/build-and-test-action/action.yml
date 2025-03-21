@@ -22,6 +22,7 @@ runs:
           Write-Host "$($_.Name)"
           dotnet restore $_.FullName 
         }
+      shell: bash
     - name: Build
       run: |
         Write-Host "Building projects:"
@@ -29,6 +30,7 @@ runs:
           Write-Host "$($_.Name)"
           dotnet build $_.FullName --no-restore --configuration Release
         }
+      shell: bash
     - name: Test
       run: |
         Write-Host "Running unittests:"
@@ -36,3 +38,4 @@ runs:
           Write-Host "$($_.Name)"
           dotnet test $_.FullName --verbosity normal --no-build --configuration Release
         }
+      shell: bash
