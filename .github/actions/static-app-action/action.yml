@@ -12,6 +12,9 @@ inputs:
   azure_location:
     description: 'Location of the Azure Resource Group'
     required: true
+  azure_webapp_name:
+    description: 'Name of the Azure Web Api'
+    required: true
 
 outputs:
   api_key:
@@ -29,6 +32,11 @@ runs:
     - name: Create/Update Static Web App
       run: |
         az staticwebapp create --name ${{ inputs.azure_static_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --location ${{ inputs.azure_location }} 
+      shell: bash
+    
+    - name: Set Environment Variable for Static Web App
+      run: |
+      az staticwebapp appsettings set --name ${{ inputs.azure_static_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --settings WEBAPI_URL=https://${{ inputs.azure_static_webapp_name }}.azurewebsites.net
       shell: bash
 
     - name: Get API Token

@@ -1,38 +1,58 @@
-using Microsoft.AspNetCore.Hosting;
-using System.Text.Json.Serialization;
+using BlijvenLerenApi;
+using BlijvenLerenApi.Exceptions;
+using BlijvenLerenApi.UseCases.Shared;
+using Microsoft.AspNetCore.Diagnostics;
+using System.Diagnostics;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
-builder.Services.ConfigureHttpJsonOptions(options =>
-{
-    options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
-});
+var cfg = builder.Configuration
+    .AddEnvironmentVariables();
 
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+if (builder.Environment.IsDevelopment() && Debugger.IsAttached)
+{
+    cfg.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
+}
+
+var config = cfg.Build();
+var keyvault = config["KEYVAULT_NAME"];
+//if (!string.IsNullOrEmpty(keyvault))
+//{
+//    cfg.AddAzureKeyVault(new Uri($"https://{keyvault}.vault.azure.net/"), new DefaultAzureCredential());
+//}
+
+builder.Services
+    .RegisterApplication(builder.Configuration);
 
 var app = builder.Build();
 
-var sampleTodos = new Todo[] {
-    new(1, "Walk the dog"),
-    new(2, "Do the dishes", DateOnly.FromDateTime(DateTime.Now)),
-    new(3, "Do the laundry", DateOnly.FromDateTime(DateTime.Now.AddDays(1))),
-    new(4, "Clean the bathroom"),
-    new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
-};
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+        if (exceptionHandlerPathFeature?.Error is UnauthorizedAccessException)
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.WriteAsync("Unauthorized access.");
+        }
+        else if (exceptionHandlerPathFeature?.Error is ForbiddenException)
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsync("The requested action is not allowed.");
+        }
+    });
+});
 
-var todosApi = app.MapGroup("/todos");
-todosApi.MapGet("/", () => sampleTodos);
-todosApi.MapGet("/{id}", (int id) =>
-    sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
-        ? Results.Ok(todo)
-        : Results.NotFound());
+var endpoints = app.Services.CreateScope().ServiceProvider.GetServices<IEndpoint>();
+var groups = endpoints.GroupBy(endpoint => endpoint.GroupName);
+foreach (var group in groups)
+{
+    var groupBuilder = app.MapGroup(group.Key);
+    foreach (var endpoint in group)
+    {
+        endpoint.RegisterEndpoint(groupBuilder);
+    }
+}
 
 app.Run();
-
-public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplete = false);
-
-[JsonSerializable(typeof(Todo[]))]
-internal partial class AppJsonSerializerContext : JsonSerializerContext
-{
-
-}

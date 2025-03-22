@@ -1,6 +1,6 @@
 @BlijvenLerenApi_HostAddress = http://localhost:5119
 
-GET {{BlijvenLerenApi_HostAddress}}/todos/
+GET {{BlijvenLerenApi_HostAddress}}/LearningResources/
 Accept: application/json
 
 ###

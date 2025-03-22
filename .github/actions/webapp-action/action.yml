@@ -24,6 +24,9 @@ inputs:
   azure_webapp_runtime:
     description: 'Runtime of the Azure Web App'
     required: true
+  azure_keyvault_name:
+    description: 'Name of the Azure Keyvault'
+    required: true
 
 outputs:
   principal_id:
@@ -62,4 +65,9 @@ runs:
     - name: Set Storage Account Name as Environment Variable
       run: |
         az webapp config appsettings set --name ${{ inputs.azure_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --settings STORAGE_ACCOUNT_NAME=${{ inputs.azure_storage_account_name }}
+      shell: bash
+
+    - name: Set Keyvault name as Environment Variable
+      run: |
+        az webapp config appsettings set --name ${{ inputs.azure_webapp_name }} --resource-group ${{ inputs.azure_resource_group }} --settings KEYVAULT_NAME=${{ inputs.azure_keyvault_name }}
       shell: bash
